@@ -1,18 +1,31 @@
-let isGameOver = false;
+import bulletImgSrc from './assets/bullet.png';
+import spaceShipImgUrl from './assets/spaceship.png';
+import alienShipImgUrl from './assets/alien.png';
+
+// let isGameOver = false;
 
 interface EntityPosition {
     x: number;
     y: number;
 }
 
+interface Entities {
+    positions: EntityPosition[];
+    speedVal: number;
+    size: number;
+    spawn: () => void;
+    check: () => void;
+    draw: () => void;
+}
+
 export const setupGame = (canvas: HTMLCanvasElement) => {
   // setup images
   const bulletImg = new Image();
-  bulletImg.src = "./src/assets/bullet.png";
+  bulletImg.src = bulletImgSrc;
   const spaceShipImg = new Image();
-  spaceShipImg.src = "./src/assets/spaceship.png";
+  spaceShipImg.src = spaceShipImgUrl;
   const alienSpaceShipImg = new Image();
-  alienSpaceShipImg.src = "./src/assets/alien.png";
+  alienSpaceShipImg.src = alienShipImgUrl;
 
   canvas.width = 600;
   canvas.height = 600;
@@ -111,11 +124,18 @@ export const setupGame = (canvas: HTMLCanvasElement) => {
       ctx.fill();
     //   window.addEventListener("click", startGame);
     //   document.addEventListener("keypress", startGame);
-      isGameOver = true;
+    //   isGameOver = true;
     },
   };
 
-  const enemies = {
+  interface Enemies {
+    fixedSpawnTimeout: number;
+    factorySpawnTimeout: number;
+    timeoutId: number;
+    scheduleSpawn: () => void;
+  }
+
+  const enemies: Entities & Enemies = {
     positions: [],
     size: 30,
     speedVal: 1,
@@ -156,17 +176,22 @@ export const setupGame = (canvas: HTMLCanvasElement) => {
     },
   };
 
-  const bullets = {
+  interface Bullets extends Omit<Entities, 'spawn'> {
+    spawn: (x: number, y: number) => void;
+  }
+
+  const bullets: Bullets = {
     positions: [],
-    speed: 5,
+    speedVal: 5,
+    size: 32,
     spawn: (x: number, y: number) => {
         bullets.positions.push({ x: x, y: y });
     },
     draw: () => {
       bullets.positions.forEach((bullet: EntityPosition, index) => {
-        bullets.positions[index].y -= bullets.speed;
+        bullets.positions[index].y -= bullets.speedVal;
 
-        ctx.drawImage(bulletImg, bullet.x - 16, bullet.y - 8, 32, 32);
+        ctx.drawImage(bulletImg, bullet.x - bullets.size / 2, bullet.y - bullets.size / 4, bullets.size, bullets.size);
       });
     },
     check: () => {
