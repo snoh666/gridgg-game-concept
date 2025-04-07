@@ -128,14 +128,14 @@ export const setupGame = (canvas: HTMLCanvasElement) => {
     },
   };
 
-  interface Enemies {
+  interface Enemies extends Entities {
     fixedSpawnTimeout: number;
     factorySpawnTimeout: number;
     timeoutId: number;
     scheduleSpawn: () => void;
   }
 
-  const enemies: Entities & Enemies = {
+  const enemies: Enemies = {
     positions: [],
     size: 30,
     speedVal: 1,
